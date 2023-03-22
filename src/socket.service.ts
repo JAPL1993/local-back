@@ -56,3 +56,24 @@ export function SocketEmit(event: string) {
     return descriptor;
   };
 }
+
+export function SocketEmitWithResponse(event: string) {
+  return function (
+    target: any,
+    propertyKey: string,
+    descriptor: PropertyDescriptor,
+  ) {
+    const originalMethod = descriptor.value;
+    descriptor.value = function (...args: any[]) {
+      return new Promise((resolve, reject) => {
+        this.emit(event, ...args, (response: any) => {
+          console.log(`Resultado lado del decorador: ${response}`);
+          resolve(response);
+        });
+      }).then((response) => {
+        return originalMethod.apply(this, [response, ...args]);
+      });
+    };
+    return descriptor;
+  };
+}
