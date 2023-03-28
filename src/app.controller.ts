@@ -1,12 +1,14 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
 import { StatusService } from './microsip/cotifast/status/status.service';
+import { ExampleService } from './socket/example/example.service';
 
 @Controller()
 export class AppController {
   constructor(
     private readonly appService: AppService,
     private statusService: StatusService,
+    private service: ExampleService,
   ) {}
 
   @Get()
@@ -14,7 +16,8 @@ export class AppController {
     return this.appService.getHello();
   }
   @Get('/ser')
-  getSer() {
-    return this.statusService.example();
+  async getSer() {
+    const data = await this.service.emitEventResponse('exampleee del emit');
+    return data;
   }
 }

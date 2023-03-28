@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   SocketClient,
   SocketEmit,
@@ -9,18 +10,24 @@ import {
 @Injectable()
 export class ExampleService extends SocketClient {
   constructor() {
-    super('http://localhost:8085/');
+    super('');
   }
 
   @SocketEvent('insertFolio')
   private insertFolio(data: any) {
-    this.fldsmfr(data.data + ': emitido').then((result) => {
-      console.log(`de la priomesa resultado : ${result}`);
+    console.log('esto se emite');
+    console.log(data);
+    this.fldsmfr(data).then((result) => {
+      console.log(result);
     });
   }
 
   @SocketEmitWithResponse('hello')
   private async fldsmfr(data) {
     return Promise.resolve(data);
+  }
+
+  async emitEventResponse(data) {
+    return await this.fldsmfr(data);
   }
 }

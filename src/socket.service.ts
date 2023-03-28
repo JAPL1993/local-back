@@ -1,15 +1,16 @@
 import { io, Socket } from 'socket.io-client';
 import 'reflect-metadata';
+import { ConfigService } from '@nestjs/config';
 
 export class SocketClient {
   private socket: Socket;
-
+  private configService: ConfigService;
   constructor(url: string) {
-    this.socket = io(url);
+    this.configService = new ConfigService();
+    this.socket = io(`${this.configService.get('URL_SOCKET_SERVER')}${url}`);
     this.socket.on('connect', () => {
       console.log('conectado');
     });
-    console.log('constructor creado');
     this.initializeEvents();
   }
 
@@ -67,7 +68,6 @@ export function SocketEmitWithResponse(event: string) {
     descriptor.value = function (...args: any[]) {
       return new Promise((resolve, reject) => {
         this.emit(event, ...args, (response: any) => {
-          console.log(`Resultado lado del decorador: ${response}`);
           resolve(response);
         });
       }).then((response) => {
